@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>Clock</title>
+  <style id="style"></style>
+</head>
+<body>
+  <div id="clock"></div>
+  <script>
+    function pad(n) {
+      return n < 10 ? '0' + n : n;
+    }
+
+    function formatTime(format) {
+      const now = new Date();
+      const days = ["日", "一", "二", "三", "四", "五", "六"];
+
+      return format
+        .replace('YYYY', now.getFullYear())
+        .replace('MM', pad(now.getMonth() + 1))
+        .replace('DD', pad(now.getDate()))
+        .replace('HH', pad(now.getHours()))
+        .replace('mm', pad(now.getMinutes()))
+        .replace('ss', pad(now.getSeconds()))
+        .replace('星期d', '星期' + days[now.getDay()])
+        .replace('d', now.getDay());
+    }
+
+    const params = new URLSearchParams(location.search);
+    const style = params.get('style') || 'font: bold 60px monospace; color: white;';
+    const format = params.get('format') || 'YYYY-MM-DD HH:mm:ss';
+
+    document.getElementById('style').textContent = `#clock { ${style} }`;
+
+    function updateClock() {
+      document.getElementById('clock').textContent = formatTime(format);
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
