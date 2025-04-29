@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>OBS Clock</title>
+  <style id="style"></style>
+</head>
+<body>
+  <div id="clock"></div>
+  <script>
+    function pad(n) { return n < 10 ? '0' + n : n; }
+
+    const chineseZodiac = ["鼠","牛","虎","兔","龍","蛇","馬","羊","猴","雞","狗","豬"];
+    const solarTerms = ["小寒","大寒","立春","雨水","驚蟄","春分","清明","穀雨",
+                        "立夏","小滿","芒種","夏至","小暑","大暑","立秋","處暑",
+                        "白露","秋分","寒露","霜降","立冬","小雪","大雪","冬至"];
+    const sampleAlmanac = {
+      "2025-04-29": {
+        "lunar": "三月初一",
+        "zodiac": "蛇",
+        "term": "穀雨",
+        "yi": "祭祀、出行、嫁娶",
+        "ji": "動土、開市"
+      }
+    };
+
+    function getLunarInfo() {
+      const now = new Date();
+      const key = now.toISOString().slice(0,10);
+      const data = sampleAlmanac[key] || {
+        lunar: "三月初一",
+        zodiac: "蛇",
+        term: "穀雨",
+        yi: "祭祀",
+        ji: "動土"
+      };
+      return {
+        LUNAR: "農曆" + data.lunar,
+        ZODIAC: "生肖" + data.zodiac,
+        SOLAR_TERM: "節氣：" + data.term,
+        ALMANAC: "宜：" + data.yi + "　忌：" + data.ji
+      };
+    }
+
+    function formatTime(format) {
+      const now = new Date();
+      const days = ["日", "一", "二", "三", "四", "五", "六"];
+      const lunar = getLunarInfo();
+      return format
+        .replace('YYYY', now.getFullYear())
+        .replace('MM', pad(now.getMonth() + 1))
+        .replace('DD', pad(now.getDate()))
+        .replace('HH', pad(now.getHours()))
+        .replace('mm', pad(now.getMinutes()))
+        .replace('ss', pad(now.getSeconds()))
+        .replace('星期d', '星期' + days[now.getDay()])
+        .replace('[LUNAR]', lunar.LUNAR)
+        .replace('[ZODIAC]', lunar.ZODIAC)
+        .replace('[SOLAR_TERM]', lunar.SOLAR_TERM)
+        .replace('[ALMANAC]', lunar.ALMANAC);
+    }
+
+    const params = new URLSearchParams(location.search);
+    const style = params.get('style') || 'font: bold 48px monospace; color: white; padding: 10px; background-color: rgba(0,0,0,0.5); border-radius: 8px;';
+    const format = params.get('format') || 'YYYY-MM-DD 星期d HH:mm:ss [LUNAR] [ZODIAC] [SOLAR_TERM] [ALMANAC]';
+
+    document.getElementById('style').textContent = `#clock { ${style} }`;
+
+    function updateClock() {
+      document.getElementById('clock').textContent = formatTime(format);
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
